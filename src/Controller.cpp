@@ -44,9 +44,7 @@ void Controller::initializeGame()
 		m_is_vs_computer = true;
 	}
 
-	m_board = new Board(m_logger, this, m_is_vs_computer);
-
-	m_board->selectBoard();
+	m_board = new Board(m_logger, this, m_is_vs_computer); // Initializes the board
 
 	system("clear");
 }
@@ -67,7 +65,6 @@ void Controller::runGame()
 	}
 	else
 	{
-
 		while (true)
 		{
 			if (!(move++ % 2 == 0 ? m_board->completeMove() : m_board->computerMove()))
@@ -80,12 +77,11 @@ void Controller::runGame()
 
 std::string Controller::nameInput(int player)
 {
-
-	std::cout << std::endl
-			  << "Player " << player << ", please enter your name: " << std::endl;
+	std::cout << std::endl << "Player " << player << ", please enter your name: " << std::endl << " > ";
+	
 	std::string name;
-	std::cout << " > ";
 	getline(std::cin, name);
+
 	std::cout << std::endl
 			  << "You have chosen \"" << name << "\"!" << std::endl
 			  << std::endl
@@ -132,13 +128,12 @@ void Controller::postGameScreen()
 					  << "--------------------------------------------" << std::endl
 					  << std::endl;
 
-			m_logger->displayLog(); // Calls the log file display
+			m_logger->displayLogs(); // Calls the log file display
 
 			std::cout << std::endl
 					  << "--------------------------------------------" << std::endl;
 			std::cout << "Press any key to close logs." << std::endl;
 			std::cin.get();
-
 			break;
 
 		case 'N':
@@ -150,7 +145,6 @@ void Controller::postGameScreen()
 					  << std::endl;
 			continue;
 		}
-
 		break;
 	}
 

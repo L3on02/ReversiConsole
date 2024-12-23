@@ -14,15 +14,12 @@ public:
 
 	int computerSelectMove();
 
+private:
 	int determineBestMove();
-
 	int checkForFlips(int index, int board[]);
-
 	void checkForFlipsRek(int index, int direction, int board[]);
 
-private:
 	int m_local_counter = 0;
-
 	int m_counter_comp = 0;
 
 	Board *m_board;

@@ -11,7 +11,7 @@ int Computer::computerSelectMove()
 int Computer::determineBestMove()
 {
 	int board_copy[100];
-	m_board->returnBoard(board_copy);
+	m_board->getBoard(board_copy);
 
 	int indexBestMove = 0;
 	int currentBestMove = -10; // eliminates the unlikely case that if the computer only has one stone as a possible move next to a corner stone,
@@ -29,13 +29,10 @@ int Computer::determineBestMove()
 	// If no corner can be occupied, the computer selects the move that flips the most opponent stones
 	else
 	{
-
 		for (int j = 0; j < 100; j++)
 		{
-
 			if (board_copy[j] == 3)
 			{
-
 				int currentMove = checkForFlips(j, board_copy);
 
 				// This makes the computer "unpredictable" as it randomly selects one of the moves if there are multiple equivalent moves
@@ -50,7 +47,6 @@ int Computer::determineBestMove()
 				}
 				else
 				{
-
 					if (currentMove >= currentBestMove)
 					{
 						indexBestMove = j;
@@ -65,11 +61,9 @@ int Computer::determineBestMove()
 
 int Computer::checkForFlips(int index, int board[])
 {
-
 	m_counter_comp = 0;
 
 	// possible weighting of the fields
-
 	// Stones adjacent to the corners are suboptimal, as the opponent has the opportunity to occupy a corner stone,
 	// they are therefore only selected if no other move is possible.
 	switch (index)
@@ -119,10 +113,8 @@ int Computer::checkForFlips(int index, int board[])
 
 void Computer::checkForFlipsRek(int index, int direction, int board[])
 {
-
 	switch (board[index + direction])
 	{
-
 	case 1:
 		m_local_counter++;
 		checkForFlipsRek((index + direction), direction, board);

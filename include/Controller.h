@@ -12,11 +12,9 @@ class Controller
 {
 public:
 	Controller(int player_count);
-
 	~Controller();
-
+	
 	void startGame();
-
 	std::string returnName(bool is_player_1);
 
 private:

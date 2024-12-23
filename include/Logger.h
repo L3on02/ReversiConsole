@@ -15,8 +15,7 @@ public:
 	~Logger();
 
 	void writeToLog(bool player1, char reihe, int spalte);
-
-	void displayLog();
+	void displayLogs();
 
 private:
 	std::ifstream m_file_in;

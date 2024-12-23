@@ -10,6 +10,8 @@ Board::Board(Logger *logger, Controller *controller, bool is_vs_computer) : m_lo
 {
 	if (is_vs_computer)
 		m_computer = new Computer(this);
+
+	selectBoard();
 }
 
 Board::~Board()
@@ -20,7 +22,6 @@ Board::~Board()
 
 bool Board::completeMove()
 { // Calls the individual sub-functions, which together represent a complete move
-
 	if (m_move_not_possible < 2)
 	{
 		if (checkForMoves() == 0)
@@ -32,22 +33,16 @@ bool Board::completeMove()
 		else
 		{
 			m_move_not_possible = 0; // As soon as one of the players can make a move, the counter is reset, as only 2 "non" moves in a row are relevant
-
 			displayBoard();
-
 			m_index_last_move = getPosition();
 
 			system("clear");
 
 			makeMove(m_index_last_move);
-
 			revertHighlights();
-
 			checkForFlips(m_index_last_move);
 		}
-
 		nextPlayer();
-
 		return true;
 	}
 	m_index_last_move = 99; // So that there is no highlighting on the last output of the complete board
@@ -75,22 +70,16 @@ bool Board::computerMove()
 			m_move_not_possible = 0; // As soon as one of the players can make a move, the counter is reset, as only 2 "non" moves in a row are relevant
 
 			displayBoard();
-
 			sleep(1.5); // Simulates "thinking" of the computer and gives the player time to see the field and the possible moves of the computer
-
 			m_index_last_move = m_computer->computerSelectMove();
 
 			system("clear");
 
 			makeMove(m_index_last_move);
-
 			revertHighlights();
-
 			checkForFlips(m_index_last_move);
 		}
-
 		nextPlayer();
-
 		return true;
 	}
 	m_index_last_move = 99; // So that there is no highlighting on the last output of the complete board
@@ -189,7 +178,7 @@ void Board::selectBoard()
 	system("clear");
 }
 
-void Board::returnBoard(int board_copy[])
+void Board::getBoard(int board_copy[])
 {
 	for (int i = 0; i < 100; i++)
 	{
@@ -234,19 +223,15 @@ void Board::displayBoard()
 
 	for (int i = 0; i < m_rows; i++)
 	{
-
 		for (int j = 0; j < m_cols; j++)
 		{
-
 			int index = i * m_cols + j;
-
 			if ((index == m_index_last_move) && (index != 0) && (index != 99))
 			{
 				std::cout << getColorCode(4); // Highlights the last move of the respective other player in red
 			}
 			else
 			{
-
 				switch (m_board[index])
 				{
 				case 1:
@@ -303,19 +288,15 @@ void Board::displayBoard()
 
 			if (counter == 10)
 			{
-
 				if (number > 1 && number < 10)
 					std::cout << " " << number - 1 << std::endl;
 				else
 					std::cout << "  " << std::endl;
-
 				number++;
 			}
 		}
-
 		counter = 0;
 	}
-
 	number = 1;
 }
 
@@ -327,7 +308,6 @@ void Board::highlightPossibleMoves(int index)
 
 int Board::fieldCheck(int index, int direction)
 {
-
 	switch (m_board[index + direction])
 	{
 	case 0:
@@ -392,7 +372,6 @@ void Board::flip(int index, int direction, int amount)
 
 void Board::checkForFlips(int index)
 {
-
 	for (int dir : {-11,-10,-9,-1,1,9,10,11})
 	{
 		m_counter = 1;
@@ -403,10 +382,8 @@ void Board::checkForFlips(int index)
 
 void Board::checkForFlipsRek(int index, int direction)
 {
-
 	switch (m_board[index + direction])
 	{
-
 	case 1:
 		if (m_is_player_1)
 		{ // flips case 1 / 2 depending on whether player 1 is up
@@ -419,7 +396,6 @@ void Board::checkForFlipsRek(int index, int direction)
 			checkForFlipsRek((index + direction), direction);
 			break;
 		}
-
 	case 2:
 		if (m_is_player_1)
 		{
@@ -432,7 +408,6 @@ void Board::checkForFlipsRek(int index, int direction)
 			flip(index - ((m_counter - 1) * direction), direction, m_counter);
 			break;
 		}
-
 	default:
 		break;
 	}
@@ -484,75 +459,72 @@ int Board::checkForMoves()
 			}
 		}
 	}
-
 	return numberOfPossibleMoves;
 }
 
 int Board::getPosition()
 {
-
-	int spalte = 0;
-	std::string feld;
+	int col = 0;
+	std::string field;
 
 	while (true)
 	{
-
 		// get user input
 		std::cout << " Enter a field position:\n";
 		std::cout << "  > ";
 
-		getline(std::cin, feld);
+		getline(std::cin, field);
 		std::cout << std::endl;
 
 		// Check user input
 		// checks if input is 2 characters long
-		if (feld.length() != 2)
+		if (field.length() != 2)
 		{
 			std::cout << "Number of characters incorrect\n";
 			printError();
 			continue;
 		}
 
-		switch (feld[0])
+		switch (field[0])
 		{ // Checks first character of input, converts letters to column number
 		case 'A':
 		case 'a':
-			spalte = 1;
+			col = 1;
 			break;
 
 		case 'B':
 		case 'b':
-			spalte = 2;
+			col = 2;
 			break;
 
 		case 'C':
 		case 'c':
-			spalte = 3;
+			col = 3;
 			break;
 
 		case 'D':
 		case 'd':
-			spalte = 4;
+			col = 4;
 			break;
 
 		case 'E':
 		case 'e':
-			spalte = 5;
+			col = 5;
 			break;
 
 		case 'F':
 		case 'f':
-			spalte = 6;
+			col = 6;
 			break;
 
 		case 'G':
 		case 'g':
-			spalte = 7;
+			col = 7;
 			break;
 
 		case 'H':
 		case 'h':
-			spalte = 8;
+			col = 8;
 			break; // Entered column accepted, switch case ends
 
 		default:
@@ -561,7 +533,7 @@ int Board::getPosition()
 			continue; // invalid input, returns to the beginning of the while loop
 		}
 
-		switch (feld[1])
+		switch (field[1])
 		{ // Checks second character of input
 		case '1':
 		case '2':
@@ -578,7 +550,7 @@ int Board::getPosition()
 			continue; // invalid input, returns to the beginning of the while loop
 		}
 
-		int index = spalte + 10 * (feld[1] - 48);
+		int index = col + 10 * (field[1] - 48);
 
 		if (m_board[index] == 3)
 		{
@@ -596,7 +568,6 @@ int Board::getPosition()
 
 void Board::makeMove(int index)
 {
-
 	if (m_is_player_1)
 	{
 		m_board[index] = 1;
@@ -607,40 +578,40 @@ void Board::makeMove(int index)
 	}
 
 	int x = index % 10; // Converts the index back to rows and columns
-	char reihe = ' ';
+	char row = ' ';
 
 	switch (x)
 	{
 	case 1:
-		reihe = 'A';
+		row = 'A';
 		break;
 	case 2:
-		reihe = 'B';
+		row = 'B';
 		break;
 	case 3:
-		reihe = 'C';
+		row = 'C';
 		break;
 	case 4:
-		reihe = 'D';
+		row = 'D';
 		break;
 	case 5:
-		reihe = 'E';
+		row = 'E';
 		break;
 	case 6:
-		reihe = 'F';
+		row = 'F';
 		break;
 	case 7:
-		reihe = 'G';
+		row = 'G';
 		break;
 	case 8:
-		reihe = 'H';
+		row = 'H';
 		break;
 	}
-	int spalte = index / 10;
+	int col = index / 10;
 
-	std::cout << "Opponent's move: " << reihe << spalte << std::endl;
+	std::cout << "Opponent's move: " << row << col << std::endl;
 
-	m_logger->writeToLog(m_is_player_1, reihe, spalte); // writes the current move to the log file
+	m_logger->writeToLog(m_is_player_1, row, col); // writes the current move to the log file
 }
 
 void Board::printError()

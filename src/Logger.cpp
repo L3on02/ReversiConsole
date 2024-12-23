@@ -6,7 +6,6 @@
 Logger::Logger(Controller *controller) : m_controller(controller)
 {
 	m_move_num = 1;
-
 	m_file_out.open("log.txt");
 
 	if (!m_file_out)
@@ -16,10 +15,8 @@ Logger::Logger(Controller *controller) : m_controller(controller)
 }
 
 Logger::~Logger()
-{ // closes the log file
-
+{
 	m_file_out.close();
-	std::cout << "log file closed" << std::endl;
 }
 
 void Logger::writeToLog(bool is_player_1, char row, int col)
@@ -28,7 +25,7 @@ void Logger::writeToLog(bool is_player_1, char row, int col)
 	m_move_num += 1;
 }
 
-void Logger::displayLog()
+void Logger::displayLogs()
 {
 	std::ifstream m_file_in("log.txt");
 
