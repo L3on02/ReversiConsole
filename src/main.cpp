@@ -3,29 +3,7 @@
 #include <cstdlib> // for rand(), srand(), ...
 #include <ctime>
 
-#include "Board.h"
-#include "LogFile.h"
-#include "GameMaster.h"
-
-// Counts the points from the board
-int countPoints(bool player1, Board &board)
-{
-	if (player1)
-		return board.countPoints(1);
-	else
-		return board.countPoints(2);
-}
-
-// Determines the winner by counting points
-bool determineWinner(Board &board)
-{ // true -> Player 1 won; false -> Player 2 won
-	if (countPoints(true, board) > countPoints(false, board))
-	{
-		return true;
-	}
-	else
-		return false;
-}
+#include "Controller.h"
 
 void rules()
 {
@@ -46,8 +24,8 @@ void rules()
 	std::cout << std::endl;
 }
 
-// The menu allows the selection of the desired game mode and then calls the "GameMaster," which controls the actual game
-bool menu(GameMaster &game_master, LogFile &log, Board &board)
+// The menu allows the selection of the desired game mode and then calls the "Controller," which controls the actual game
+int menu()
 {
 	system("clear");
 	std::cout << std::endl;
@@ -62,8 +40,8 @@ bool menu(GameMaster &game_master, LogFile &log, Board &board)
 	{
 		std::cout << "Please select the desired game mode: " << std::endl;
 		std::cout << std::endl;
-		std::cout << "    (1) -> Player vs. Player " << std::endl;
-		std::cout << "    (2) -> Player vs. Computer " << std::endl;
+		std::cout << "    (1) -> Player vs. Computer " << std::endl;
+		std::cout << "    (2) -> Player vs. Player " << std::endl;
 		std::cout << "    (3) -> Display game rules " << std::endl;
 		std::cout << std::endl;
 		std::cout << "To exit, please enter '0'. " << std::endl;
@@ -85,16 +63,12 @@ bool menu(GameMaster &game_master, LogFile &log, Board &board)
 
 		switch (selection)
 		{
+		case '0':
+			std::cout << "The game will be closed!" << std::endl;
+			std::cout << std::endl;
 		case '1':
-			game_master.initializeGame(2, board, log, game_master); // Calls the initialization function of the "Game" class and passes that 2 players play against each other
-			board.displayBoard(game_master);
-			return true;
-
 		case '2':
-			game_master.initializeGame(1, board, log, game_master); // Calls the initialization function of the "Game" class and passes that 1 player plays (vs. Computer)
-			board.displayBoard(game_master);
-			return true;
-
+			return selection - '0';
 		case '3':
 			rules();
 			break;
@@ -109,74 +83,8 @@ bool menu(GameMaster &game_master, LogFile &log, Board &board)
 	}
 }
 
-// Displays winner etc. and contains the option to view the log file
-bool postGameScreen(std::string winner, int points, LogFile &log)
-{ // Returns true for a desired rematch
-
-	switch (points)
-	{
-	case 32:
-		std::cout << std::endl;
-		std::cout << "-----------------------------------" << std::endl;
-		std::cout << std::endl;
-		std::cout << "With 32 points each, the game ends in a draw!" << std::endl;
-		std::cout << std::endl;
-		std::cout << "-----------------------------------" << std::endl;
-		std::cout << std::endl;
-		break;
-
-	default:
-		std::cout << std::endl;
-		std::cout << "-----------------------------------" << std::endl;
-		std::cout << std::endl;
-		std::cout << "With " << points << " points, the winner is " << winner << "!" << std::endl;
-		std::cout << std::endl;
-		std::cout << "-----------------------------------" << std::endl;
-		std::cout << std::endl;
-		break;
-	}
-
-	while (true)
-	{ // To repeat on incorrect input
-
-		std::cout << "Would you like to view the log file? [Y/N]" << std::endl;
-		char input;
-		std::cin >> input;
-		std::cout << std::endl;
-		std::cin.ignore();
-
-		switch (input)
-		{
-		case 'Y':
-		case 'y':
-			std::cout << "Opening log file..." << std::endl;
-			std::cout << "--------------------------------------------" << std::endl;
-			std::cout << std::endl;
-
-			log.displayLog(); // Calls the log file display
-
-			std::cout << std::endl;
-			std::cout << "--------------------------------------------" << std::endl;
-
-			log.~LogFile(); // Calls the destructor of the logFile class since we no longer need it
-
-			break;
-
-		case 'N':
-		case 'n':
-			break;
-
-		default:
-			std::cout << "Invalid input, please enter 'Y' for Yes or 'N' for No." << std::endl;
-			std::cout << std::endl;
-			continue;
-		}
-
-		break;
-	}
-
-	std::cout << std::endl;
-
+bool queryPlayAgain()
+{
 	while (true)
 	{ // To loop back on case default
 		std::cout << "Would you like to play again? [Y/N]" << std::endl;
@@ -206,28 +114,23 @@ bool postGameScreen(std::string winner, int points, LogFile &log)
 			continue;
 		}
 	}
-	system("clear");
 }
 
 int main()
 {
 	srand(time(0)); // since we will need a random generator later
 
-	while (true)
+	do
 	{
+		int selection = menu();
 
-		Board board(true);
-		LogFile log;
-		GameMaster game_master;
-
-		if (!(menu(game_master, log, board))) // If "end game" is selected in the menu, menu returns false, and the while loop is exited
+		if (selection == 0)
 			break;
 
-		bool Player1Wins = determineWinner(board); // Stores whether Player1 won
+		Controller controller(selection);
+		controller.startGame();
 
-		if (!(postGameScreen(game_master.returnName(Player1Wins), countPoints(Player1Wins, board), log)))
-		{ // If a new game is not started, the while loop is exited
-			break;
-		}
-	}
+	} while (queryPlayAgain());
+
+	return 0;
 }

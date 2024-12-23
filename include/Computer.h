@@ -4,33 +4,28 @@
 #include <string>
 #include <iostream>
 
-#include "Board.h"
-#include "GameMaster.h"
-
+// forward declaration
 class Board;
 
-class Computer {
+class Computer
+{
 public:
-	Computer() {};
+	Computer(Board *board);
 
-	int computerMove(Board &brett);
+	int computerSelectMove();
 
 	int determineBestMove();
 
-	int checkForFlips(int index);
+	int checkForFlips(int index, int board[]);
 
-	void checkForFlipsRek(int index, int direction);
+	void checkForFlipsRek(int index, int direction, int board[]);
 
 private:
-	int m_copy_board[100] = { 0 };
-	
 	int m_local_counter = 0;
-	
+
 	int m_counter_comp = 0;
 
-	const int m_directions[8] = {
-	-11,-10,-9,-1,1,9,10,11
-	};
+	Board *m_board;
 };
 
 #endif

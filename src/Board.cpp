@@ -1,10 +1,24 @@
 #include "Board.h"
-#include "TestBoards.h"
+#include "Logger.h"
+#include "Computer.h"
+#include "Controller.h"
+#include "DefaultBoards.h"
 
 #include <unistd.h>
 
+Board::Board(Logger *logger, Controller *controller, bool is_vs_computer) : m_logger(logger), m_controller(controller)
+{
+	if (is_vs_computer)
+		m_computer = new Computer(this);
+}
 
-bool Board::completeMove(LogFile &log, GameMaster &GM)
+Board::~Board()
+{
+	if (m_computer)
+		delete m_computer;
+};
+
+bool Board::completeMove()
 { // Calls the individual sub-functions, which together represent a complete move
 
 	if (m_move_not_possible < 2)
@@ -19,19 +33,17 @@ bool Board::completeMove(LogFile &log, GameMaster &GM)
 		{
 			m_move_not_possible = 0; // As soon as one of the players can make a move, the counter is reset, as only 2 "non" moves in a row are relevant
 
-			displayBoard(GM);
+			displayBoard();
 
-			int eingabe = getPosition();
-
-			m_index_last_move = eingabe; // enables highlighting of the last move
+			m_index_last_move = getPosition();
 
 			system("clear");
 
-			makeMove(eingabe, log, GM);
+			makeMove(m_index_last_move);
 
 			revertHighlights();
 
-			checkForFlips(eingabe);
+			checkForFlips(m_index_last_move);
 		}
 
 		nextPlayer();
@@ -42,8 +54,14 @@ bool Board::completeMove(LogFile &log, GameMaster &GM)
 	return false;
 }
 
-bool Board::computerMove(Board &brett, Computer &computer, LogFile &log, GameMaster &GM)
+bool Board::computerMove()
 {
+	if (!m_computer)
+	{
+		std::cout << "Error: Computer object not initialized" << std::endl;
+		return false;
+	}
+
 	if (m_move_not_possible < 2)
 	{
 		if (checkForMoves() == 0)
@@ -56,21 +74,19 @@ bool Board::computerMove(Board &brett, Computer &computer, LogFile &log, GameMas
 		{
 			m_move_not_possible = 0; // As soon as one of the players can make a move, the counter is reset, as only 2 "non" moves in a row are relevant
 
-			displayBoard(GM);
+			displayBoard();
 
 			sleep(1.5); // Simulates "thinking" of the computer and gives the player time to see the field and the possible moves of the computer
 
-			int eingabe = computer.computerMove(brett);
-
-			m_index_last_move = eingabe; // enables highlighting of the last move
+			m_index_last_move = m_computer->computerSelectMove();
 
 			system("clear");
 
-			makeMove(eingabe, log, GM);
+			makeMove(m_index_last_move);
 
 			revertHighlights();
 
-			checkForFlips(eingabe);
+			checkForFlips(m_index_last_move);
 		}
 
 		nextPlayer();
@@ -79,6 +95,14 @@ bool Board::computerMove(Board &brett, Computer &computer, LogFile &log, GameMas
 	}
 	m_index_last_move = 99; // So that there is no highlighting on the last output of the complete board
 	return false;
+}
+
+void Board::loadBoard(int board[])
+{
+	for (int i = 0; i < 100; i++)
+	{
+		m_board[i] = board[i];
+	}
 }
 
 void Board::revertHighlights()
@@ -113,11 +137,11 @@ int Board::countPoints(int player)
 	return points;
 }
 
-void Board::testBoard()
+void Board::selectBoard()
 {
 
 	std::cout << std::endl;
-	std::cout << "Which game board would you like to use? (Enter 1 - 5, otherwise random)" << std::endl;
+	std::cout << "Which game board would you like to use? (enter 0 for default board or 1-5 for test boards)" << std::endl;
 	std::cout << " > ";
 	char x;
 	std::cin >> x;
@@ -137,59 +161,43 @@ void Board::testBoard()
 	}
 
 	switch (x)
-	{ // Selects one of the 5 available game boards
+	{
 	case '1':
-		for (int i = 0; i < 100; i++)
-		{
-			m_board[i] = test_board_1[i];
-		}
+		loadBoard(test_board_1);
 		break;
 
 	case '2':
-		for (int i = 0; i < 100; i++)
-		{
-			m_board[i] = test_board_2[i];
-		}
+		loadBoard(test_board_2);
 		break;
 
 	case '3':
-		for (int i = 0; i < 100; i++)
-		{
-			m_board[i] = test_board_3[i];
-		}
+		loadBoard(test_board_3);
 		break;
 
 	case '4':
-		for (int i = 0; i < 100; i++)
-		{
-			m_board[i] = test_board_4[i];
-		}
+		loadBoard(test_board_4);
 		break;
 
 	case '5':
-		for (int i = 0; i < 100; i++)
-		{
-			m_board[i] = test_board_5[i];
-		}
+		loadBoard(test_board_5);
+		break;
+
+	default:
+		loadBoard(default_board);
+		break;
 	}
-
-	std::cout << "--------------------------------------------" << std::endl;
-	std::cout << "Test game board " << x << " was selected" << std::endl;
-	std::cout << "--------------------------------------------" << std::endl;
-
-	sleep(1.2);
 	system("clear");
 }
 
-void Board::returnBoard(int *copySpielbrett)
+void Board::returnBoard(int board_copy[])
 {
 	for (int i = 0; i < 100; i++)
 	{
-		copySpielbrett[i] = m_board[i];
+		board_copy[i] = m_board[i];
 	}
 }
 
-void Board::displayBoard(GameMaster &GM)
+void Board::displayBoard()
 {
 	// system("clear");
 	int counter = 0;
@@ -199,13 +207,13 @@ void Board::displayBoard(GameMaster &GM)
 	if (m_is_player_1)
 	{ // Displays player in color
 		std::cout << getColorCode(6);
-		std::cout << "  ---------- " << std::setw(6) << std::left << GM.returnName(true) << " ----------" << std::endl;
+		std::cout << "  ---------- " << std::setw(6) << std::left << m_controller->returnName(true) << " ----------" << std::endl;
 		std::cout << std::endl;
 	}
 	else
 	{
 		std::cout << getColorCode(5);
-		std::cout << "  ---------- " << std::setw(6) << std::left << GM.returnName(false) << " ----------" << std::endl;
+		std::cout << "  ---------- " << std::setw(6) << std::left << m_controller->returnName(false) << " ----------" << std::endl;
 		std::cout << std::endl;
 	}
 
@@ -385,10 +393,10 @@ void Board::flip(int index, int direction, int amount)
 void Board::checkForFlips(int index)
 {
 
-	for (int n = 0; n < 8; n++)
+	for (int dir : {-11,-10,-9,-1,1,9,10,11})
 	{
 		m_counter = 1;
-		checkForFlipsRek(index, m_directions[n]);
+		checkForFlipsRek(index, dir);
 	}
 	m_counter = 0;
 }
@@ -454,10 +462,10 @@ int Board::checkForMoves()
 			if (m_board[index] == whichPlayer)
 			{ // Searches for fields
 
-				for (int n = 0; n < 8; n++)
+				for (int dir : {-11,-10,-9,-1,1,9,10,11})
 				{
 					m_counter = 0;
-					int x = fieldCheck(index, m_directions[n]); // in x it is simultaneously passed whether the move is possible with x = -1||0,
+					int x = fieldCheck(index, dir); // in x it is simultaneously passed whether the move is possible with x = -1||0,
 																// or with x > 0 how many stones need to be flipped in the given direction
 
 					switch (x)
@@ -586,7 +594,7 @@ int Board::getPosition()
 	}
 }
 
-void Board::makeMove(int index, LogFile &log, GameMaster &GM)
+void Board::makeMove(int index)
 {
 
 	if (m_is_player_1)
@@ -632,7 +640,7 @@ void Board::makeMove(int index, LogFile &log, GameMaster &GM)
 
 	std::cout << "Opponent's move: " << reihe << spalte << std::endl;
 
-	log.writeToLog(m_is_player_1, reihe, spalte, GM); // writes the current move to the log file
+	m_logger->writeToLog(m_is_player_1, reihe, spalte); // writes the current move to the log file
 }
 
 void Board::printError()

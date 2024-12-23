@@ -1,6 +1,9 @@
-#include "LogFile.h"
+#include "Logger.h"
+#include "Controller.h"
 
-LogFile::LogFile()
+#include <iomanip>
+
+Logger::Logger(Controller *controller) : m_controller(controller)
 {
 	m_move_num = 1;
 
@@ -12,20 +15,20 @@ LogFile::LogFile()
 		std::cout << "log file opened successfully" << std::endl;
 }
 
-LogFile::~LogFile()
+Logger::~Logger()
 { // closes the log file
 
 	m_file_out.close();
 	std::cout << "log file closed" << std::endl;
 }
 
-void LogFile::writeToLog(bool is_player_1, char row, int col, GameMaster &GM)
+void Logger::writeToLog(bool is_player_1, char row, int col)
 {
-	m_file_out << std::setw(2) << std::right << m_move_num << ". " << std::setw(8) << std::left << GM.returnName(is_player_1) << " makes move: " << row << col << std::endl;
+	m_file_out << std::setw(2) << std::right << m_move_num << ". " << std::setw(8) << std::left << m_controller->returnName(is_player_1) << " makes move: " << row << col << std::endl;
 	m_move_num += 1;
 }
 
-void LogFile::displayLog()
+void Logger::displayLog()
 {
 	std::ifstream m_file_in("log.txt");
 
