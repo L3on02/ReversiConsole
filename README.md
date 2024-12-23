@@ -1,7 +1,7 @@
 # ReversiConsole
-Strategiespiel [Reversi](https://en.wikipedia.org/wiki/Reversi) als Konsolenanwendung mit 
-Zugüberprüfung auf Korrektheit, Ausgabe des Spielverlaufs in einer Log-Datei und Computergegner.
-Es kann Spieler gegen Spieler oder gegen einen Computergegner gespielt werden.
+A strategy game [Reversi](https://en.wikipedia.org/wiki/Reversi) as a console application with 
+move validation, logging of the game progress in a log file, and a computer opponent.
+It can be played player versus player or against a computer opponent.
 
-![alt text](Reversi.png "Reversi")
-![alt text](ReversiLog.png "Log-Datei")
+![Reversi](resources/Reversi.png "Reversi")
+![Log File](resources/ReversiLog.png "Log File")

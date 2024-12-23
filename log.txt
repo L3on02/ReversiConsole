@@ -1,0 +1,27 @@
+ 1. Computer makes move: C4
+ 2. Leon     makes move: C3
+ 3. Computer makes move: E6
+ 4. Leon     makes move: F6
+ 5. Computer makes move: G6
+ 6. Leon     makes move: C5
+ 7. Computer makes move: B3
+ 8. Leon     makes move: D6
+ 9. Computer makes move: C6
+10. Leon     makes move: C7
+11. Computer makes move: D3
+12. Leon     makes move: E3
+13. Computer makes move: C8
+14. Leon     makes move: A3
+15. Computer makes move: F4
+16. Leon     makes move: F5
+17. Computer makes move: C2
+18. Leon     makes move: D1
+19. Computer makes move: C1
+20. Leon     makes move: F7
+21. Computer makes move: F8
+22. Leon     makes move: H6
+23. Computer makes move: A4
+24. Leon     makes move: A5
+25. Computer makes move: H5
+26. Leon     makes move: H4
+27. Computer makes move: E1
