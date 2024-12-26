@@ -16,13 +16,20 @@ public:
 
 private:
 	int determineBestMove();
-	int checkForFlips(int index, int board[]);
-	void checkForFlipsRek(int index, int direction, int board[]);
-
-	int m_local_counter = 0;
-	int m_counter_comp = 0;
 
 	Board *m_board;
-};
 
+	int m_weight_map[100] = { 
+		4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+		4, 5,-8, 2, 2, 2, 2,-8, 5, 4,
+		4,-8,-8, 1, 1, 1, 1,-8,-8, 4,
+		4, 2, 1, 1, 1, 1, 1, 1, 2, 4,
+		4, 2, 1, 1, 1, 1, 1, 1, 2, 4,
+		4, 2, 1, 1, 1, 1, 1, 1, 2, 4,
+		4, 2, 1, 1, 1, 1, 1, 1, 2, 4,
+		4,-8,-8, 1, 1, 1, 1,-8,-8, 4,
+		4, 5,-8, 2, 2, 2, 2,-8, 5, 4,
+		4, 4, 4, 4, 4, 4, 4, 4, 4, 4
+	};
+};
 #endif

@@ -1,26 +1,30 @@
 #include "Controller.h"
+#include "Computer.h"
 #include "Board.h"
-#include "Logger.h"
+#include "Interface.h"
 
-Controller::Controller(int player_count) : m_player_count(player_count)
+Controller::Controller()
 {
-	m_logger = new Logger(this);
+	m_interface = new Interface(this);
 }
 
 Controller::~Controller()
 {
-	delete m_logger;
-	if (m_board)
-		delete m_board;
+	delete m_interface;
 }
 
-void Controller::startGame()
+void Controller::start()
 {
-	this->initializeGame(); // Initializes the game
+	do
+	{
+		// Shows the menu and returns the number of players
+		if (m_player_count = m_interface->showMenu(); m_player_count == 0)
+			break;
+		initializeGame();
+		runGame();
+		evaluateGame();
 
-	this->runGame(); // Calls the game function
-
-	this->postGameScreen(); // Displays the post-game screen
+	} while (m_interface->queryPlayAgain());
 }
 
 std::string Controller::returnName(bool is_player_1)
@@ -28,14 +32,13 @@ std::string Controller::returnName(bool is_player_1)
 	return is_player_1 ? m_player1_name : m_player2_name;
 }
 
-void Controller::initializeGame()
-{ // Initializes all important values and lets the player set the parameters for the game.
-
-	m_player1_name = nameInput(1); // reads the name of player 1
+void Controller::initializeGame() // Initializes all important values and lets the player set the parameters for the game.
+{
+	m_player1_name = m_interface->nameInput(1); // reads the name of player 1
 
 	if (m_player_count == 2)
 	{
-		m_player2_name = nameInput(2); // reads the name of player 2 in case of player vs player
+		m_player2_name = m_interface->nameInput(2); // reads the name of player 2 in case of player vs player
 		m_is_vs_computer = false;
 	}
 	else
@@ -43,110 +46,65 @@ void Controller::initializeGame()
 		m_player2_name = "Computer";
 		m_is_vs_computer = true;
 	}
+	
+	int board_id = m_interface->showSelectBoard();
+	m_board = new Board(board_id);
 
-	m_board = new Board(m_logger, this, m_is_vs_computer); // Initializes the board
-
-	system("clear");
+	if (m_is_vs_computer)
+	{
+		m_computer = new Computer(m_board);
+	}
 }
 
 void Controller::runGame()
 {
-	int move = rand() % 2;
-	if (move == 1)
-		m_board->nextPlayer();
+	int player;
+	int move;
+	while (!m_board->gameEnd())
+	{
+		player = m_board->getNextPlayer();
 
-	if (!m_is_vs_computer)
-	{
-		while (true)
+		int board[100];
+		m_board->getBoard(board, true);
+
+		bool false_move = false;
+		do
 		{
-			if (!m_board->completeMove())
-				break;
-		}
+			m_interface->displayBoard(board, player == 1);
+			if (m_is_vs_computer && player == 2)
+			{
+				move = m_computer->computerSelectMove();
+			}
+			else
+			{
+				move = m_interface->getPlayerMove(false_move);
+				false_move = true;
+			}
+		} while (!m_board->makeMove(move));
 	}
-	else
-	{
-		while (true)
-		{
-			if (!(move++ % 2 == 0 ? m_board->completeMove() : m_board->computerMove()))
-				break;
-		}
-	}
-	system("clear");
-	std::cout << std::endl;
 }
 
-std::string Controller::nameInput(int player)
+void Controller::evaluateGame()
 {
-	std::cout << std::endl << "Player " << player << ", please enter your name: " << std::endl << " > ";
-	
-	std::string name;
-	getline(std::cin, name);
+	int result_board[100];
+	m_board->getBoard(result_board, true);
+	m_interface->displayBoard(result_board, true, true);
 
-	std::cout << std::endl
-			  << "You have chosen \"" << name << "\"!" << std::endl
-			  << std::endl
-			  << "-----------------------------------" << std::endl;
-	return name;
+	m_interface->showResultScreen(m_board->countPoints());
+	cleanUp();
 }
 
-// Displays winner etc. and contains the option to view the log file
-void Controller::postGameScreen()
+void Controller::cleanUp()
 {
-	std::cout << std::endl
-			  << "-----------------------------------" << std::endl
-			  << std::endl;
-
-	int points_player1 = m_board->countPoints(1);
-	int points_player2 = m_board->countPoints(2);
-
-	if (points_player1 == points_player2)
-		std::cout << "With " << points_player1 << " points each, the game ends in a draw!" << std::endl;
-	else
+	if (m_board)
 	{
-		std::string winner = points_player1 > points_player2 ? m_player1_name : m_player2_name;
-		int points = points_player1 > points_player2 ? points_player1 : points_player2;
-
-		std::cout << "With " << points << " points, the winner is " << winner << "!" << std::endl;
-	}
-	std::cout << std::endl
-			  << "-----------------------------------" << std::endl
-			  << std::endl;
-
-	while (true)
-	{
-		std::cout << "Would you like to view the log file? [Y/N]" << std::endl;
-		char input;
-		std::cin >> input;
-		std::cout << std::endl;
-		std::cin.ignore();
-
-		switch (input)
-		{
-		case 'Y':
-		case 'y':
-			std::cout << "Opening log file..." << std::endl
-					  << "--------------------------------------------" << std::endl
-					  << std::endl;
-
-			m_logger->displayLogs(); // Calls the log file display
-
-			std::cout << std::endl
-					  << "--------------------------------------------" << std::endl;
-			std::cout << "Press any key to close logs." << std::endl;
-			std::cin.get();
-			break;
-
-		case 'N':
-		case 'n':
-			break;
-
-		default:
-			std::cout << "Invalid input, please enter 'Y' for Yes or 'N' for No." << std::endl
-					  << std::endl;
-			continue;
-		}
-		break;
+		delete m_board;
+		m_board = nullptr;
 	}
 
-	system("clear");
+	if (m_computer)
+	{
+		delete m_computer;
+		m_computer = nullptr;
+	}
 }

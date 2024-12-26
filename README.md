@@ -1,8 +1,8 @@
 # ReversiConsole
-A strategy game [Reversi](https://en.wikipedia.org/wiki/Reversi) as a console application with 
-move validation, logging of the game progress in a log file, and a computer opponent.
-It can be played player versus player or against a computer opponent.
-
+Implementation of the strategy game [Reversi](https://en.wikipedia.org/wiki/Reversi) as a console application with 
+move validation a simple TUI and a computer opponent. The game is implemented in C++ in a modular way, with the game 
+logic separated from the user interface. The game can be played by two human players or by a human player against a
+computer opponent. The computer opponent uses a simple heuristic to determine the best move to make.
 
 ## How to play
 1. Clone the repository
@@ -15,6 +15,6 @@ It can be played player versus player or against a computer opponent.
     ./ReversiConsole
     ```
 3. Follow the instructions on the screen to play the game.
+
 ## Screenshots
 ![Reversi](resources/Reversi.png "Reversi")
-![Log File](resources/ReversiLog.png "Log File")
