@@ -18,6 +18,13 @@ public:
 	Board(int board);
 
 	/**
+	 * @brief Construct a new Board object by copying another board
+	 * 
+	 * @param other The board to copy
+	 */
+	Board(const Board &other);
+
+	/**
 	 * @brief Get all possible moves for the current player
 	 * 
 	 * @return A `vector` of all possible moves for the current player

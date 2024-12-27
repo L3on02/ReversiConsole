@@ -6,6 +6,20 @@ Board::Board(int board)
 	selectBoard(board);
 }
 
+Board::Board(const Board &other)
+	: m_is_player1(other.m_is_player1),
+	  m_game_end(other.m_game_end),
+	  m_move_not_possible(other.m_move_not_possible),
+	  m_index_last_move(other.m_index_last_move),
+	  m_possible_moves(other.m_possible_moves)
+{
+	// Copy the board array using getter methods or directly if allowed
+	for (int i = 0; i < 100; ++i)
+	{
+		m_board[i] = other.m_board[i];
+	}
+}
+
 void Board::selectBoard(int board)
 {
 	switch (board)
