@@ -83,12 +83,12 @@ int Interface::showMenu()
 		{
 		case '1':
 			std::cout << "Starting a game against the computer..." << std::endl;
-			sleep(1);
+			sleep(0.5);
 			system("clear");
 			return 1;
 		case '2':
 			std::cout << "Starting a PvP game..." << std::endl;
-			sleep(1);
+			sleep(0.5);
 			system("clear");
 			return 2;
 		case '3':
@@ -120,7 +120,7 @@ bool Interface::queryPlayAgain()
 			std::cout << "Starting a new game." << std::endl;
 			std::cout << std::endl;
 			std::cout << "--------------------------------------------" << std::endl;
-			sleep(1);
+			sleep(0.5);
 			system("clear");
 			return true;
 
@@ -146,10 +146,7 @@ std::string Interface::nameInput(int player)
 
 	std::string name;
 	getline(std::cin, name);
-
-	std::cout << std::endl
-			  << "You have chosen \"" << name << "\"!" << std::endl;
-	sleep(1);
+	
 	system("clear");
 	return name;
 }
