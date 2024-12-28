@@ -7,7 +7,8 @@ Board::Board(int board)
 }
 
 Board::Board(const Board &other)
-	: m_is_player1(other.m_is_player1),
+	: m_current_player(other.m_current_player),
+	  m_other_player(other.m_other_player),
 	  m_game_end(other.m_game_end),
 	  m_move_not_possible(other.m_move_not_possible),
 	  m_index_last_move(other.m_index_last_move),
@@ -44,7 +45,8 @@ void Board::selectBoard(int board)
 		break;
 	}
 
-	m_is_player1 = rand() % 2; // Randomly select the starting player
+	m_current_player = (rand() % 2) + 1; // Randomly select the starting player
+	m_other_player = m_current_player ^ 0b11;
 	nextPlayer();
 }
 
@@ -53,29 +55,46 @@ void Board::loadBoard(int board[])
 	for (int i = 0; i < 100; i++)
 	{
 		m_board[i] = board[i];
+
+		if (board[i] == 1 || board[i] == 2)
+		{
+			m_stone_counts[board[i]]++;
+			m_stone_counts[0]++;
+		}
 	}
 }
 
-std::vector<move> Board::getMoves()
+std::vector<std::pair<int, std::vector<int>>> Board::getMoves(bool get_estimations) const
 {
-	std::vector<move> moves;
-	for (move mv : m_possible_moves)
+	std::vector<std::pair<int, std::vector<int>>> moves;
+
+	if (get_estimations)
 	{
-		moves.push_back(mv);
+		for (auto &mv : m_estimated_moves)
+		{
+			moves.push_back(mv);
+		}
+	}
+	else
+	{
+		for (auto &mv : m_possible_moves)
+		{
+			moves.push_back(mv);
+		}
 	}
 	return moves;
 }
 
 void Board::nextPlayer()
 {
-	m_is_player1 = !m_is_player1;
+	togglePlayer();
 	checkForMoves();
 
 	if (m_possible_moves.empty())
 	{
 		m_move_not_possible++;
 
-		m_is_player1 = !m_is_player1;
+		togglePlayer();
 		checkForMoves();
 
 		if (m_possible_moves.empty()) // Both players have no moves
@@ -93,26 +112,23 @@ void Board::nextPlayer()
 	}
 }
 
-std::pair<int, int> Board::countPoints()
+inline void Board::togglePlayer()
 {
-	int points_a = 0;
-	int points_b = 0;
-	for (int i = 0; i < 100; i++)
-	{
-		if (m_board[i] == 1)
-			points_a++;
-		else if (m_board[i] == 2)
-			points_b++;
-	}
-	return std::make_pair(points_a, points_b);
+	m_current_player = m_other_player;
+	m_other_player ^= 0b11;  // xor turns the player 1 into player 2 and vice versa
 }
 
-int Board::getNextPlayer()
+std::pair<int, int> Board::countPoints() const
 {
-	return m_is_player1 ? 1 : 2;
+	return std::make_pair(m_stone_counts[1], m_stone_counts[2]);
 }
 
-void Board::getBoard(int board_copy[], bool highlight)
+int Board::getCurrentPlayer() const
+{
+	return m_current_player;
+}
+
+void Board::copyBoard(int board_copy[], bool highlight) const
 {
 	for (int i = 0; i < 100; i++)
 	{
@@ -121,7 +137,7 @@ void Board::getBoard(int board_copy[], bool highlight)
 
 	if (highlight)
 	{
-		for (move mv : m_possible_moves)
+		for (auto &mv : m_possible_moves)
 		{
 			board_copy[mv.first] = 3;
 		}
@@ -133,21 +149,28 @@ void Board::getBoard(int board_copy[], bool highlight)
 	}
 }
 
+const int *Board::getBoard() const
+{
+    return m_board;
+}
+
 void Board::checkForMoves()
 {
 	m_possible_moves.clear();
-	int which_player = m_is_player1 ? 1 : 2;
+	m_estimated_moves.clear(); // Clear the estimated moves for the other player
 
-	for (int i = 1; i < m_rows - 1; i++) // Exclude borders of the board
+	for (int i = 1; i < 10 - 1; i++) // Exclude borders of the board
 	{
-		for (int j = 1; j < m_cols - 1; j++)
+		for (int j = 1; j < 10 - 1; j++)
 		{
-			int index = i * m_cols + j;
+			int index = i * 10 + j;
 
 			if (m_board[index] == 0) // Check only empty spaces
 			{
-				std::vector<int> move_flips;
-				for (int direction : {-11, -10, -9, -1, 1, 9, 10, 11}) // Check all 8 directions
+				std::vector<int> move_flips_current;
+				std::vector<int> move_flips_other;
+
+				auto checkDirection = [&](int direction, int player, std::vector<int> &result) -> bool
 				{
 					std::vector<int> flip_candidates;
 					int current_index = index + direction;
@@ -155,25 +178,36 @@ void Board::checkForMoves()
 					while (m_board[current_index] != 4) // Stop at the border
 					{
 						if (m_board[current_index] == 0)
-							break;
+							return false;
 
 						// If the current field is the player's own color and there are flips in between, a valid move was found
-						if (m_board[current_index] == which_player)
+						if (m_board[current_index] == player)
 						{
 							if (!flip_candidates.empty())
-								move_flips.insert(move_flips.end(), flip_candidates.begin(), flip_candidates.end());
-							break;
+							{
+								result.insert(result.end(), flip_candidates.begin(), flip_candidates.end());
+								return true;
+							}
+							return false;
 						}
 
 						flip_candidates.push_back(current_index);
 						current_index += direction;
 					}
+					return false;
+				};
+
+				for (int direction : {-11, -10, -9, -1, 1, 9, 10, 11}) // Check all 8 directions
+				{
+					if (!checkDirection(direction, m_current_player, move_flips_current))
+						checkDirection(direction, m_other_player , move_flips_other);
 				}
 
-				if (!move_flips.empty()) // If any valid flips were found, this is a valid move
-				{
-					m_possible_moves[index] = move_flips;
-				}
+				if (!move_flips_current.empty()) // If any valid flips were found, this is a valid move
+					m_possible_moves[index] = move_flips_current;
+
+				if (!move_flips_other.empty()) // also store the estimated flips for the other player (disregarding the current player's move)
+					m_estimated_moves[index] = move_flips_other;
 			}
 		}
 	}
@@ -186,11 +220,19 @@ bool Board::makeMove(int index)
 		return false;
 	}
 
-	m_board[index] = m_is_player1 ? 1 : 2;
+	m_board[index] = m_current_player;
+
+	// Update stone counts
+	m_stone_counts[m_current_player]++;
+	m_stone_counts[0]++;
 
 	for (int flip_index : m_possible_moves[index])
 	{
-		m_board[flip_index] = m_is_player1 ? 1 : 2;
+		m_board[flip_index] = m_current_player;
+
+		// Update stone counts for the flipped stones
+		m_stone_counts[m_current_player]++;
+		m_stone_counts[m_other_player]--;
 	}
 
 	m_index_last_move = index;
@@ -198,7 +240,7 @@ bool Board::makeMove(int index)
 	return true;
 }
 
-bool Board::gameEnd()
+bool Board::gameEnd() const
 {
 	return m_game_end;
 }
