@@ -2,6 +2,7 @@
 #include "Computer.h"
 #include "Board.h"
 #include "Interface.h"
+#include <unistd.h>
 
 Controller::Controller()
 {
@@ -62,10 +63,10 @@ void Controller::runGame()
 	int move;
 	while (!m_board->gameEnd())
 	{
-		player = m_board->getNextPlayer();
+		player = m_board->getCurrentPlayer();
 
 		int board[100];
-		m_board->getBoard(board, true);
+		m_board->copyBoard(board, true);
 
 		bool false_move = false;
 		do
@@ -74,6 +75,12 @@ void Controller::runGame()
 			if (m_is_vs_computer && player == 2)
 			{
 				move = m_computer->computerSelectMove();
+				std::string move_str = char(move % 10 + 'A' - 1) + std::to_string(move / 10);
+				std::cerr << "Computer selected move: " << move_str << std::endl;
+				
+				std::cout << "Continue..." << std::endl;
+				std::cin.get();
+				std::cin.ignore();
 			}
 			else
 			{
@@ -87,7 +94,7 @@ void Controller::runGame()
 void Controller::evaluateGame()
 {
 	int result_board[100];
-	m_board->getBoard(result_board, true);
+	m_board->copyBoard(result_board, true);
 	m_interface->displayBoard(result_board, true, true);
 
 	m_interface->showResultScreen(m_board->countPoints());
