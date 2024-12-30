@@ -1,7 +1,6 @@
 #ifndef GAMEMASTER_H
 #define GAMEMASTER_H
 
-#include <iostream>
 #include <string>
 
 // forward declarations

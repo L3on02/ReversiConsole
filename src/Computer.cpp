@@ -17,7 +17,7 @@ int Computer::computerSelectMove()
 	int best_move = moves[0].first;
 	int best_value = -1000;
 
-	int search_depth = 4 + (16 / (1 + exp(-0.1 * ( m_board->totalStones() - 50)))); // sigmoid function to determine search depth -> 
+	int search_depth = 6;
 
 	for (auto &mv : moves)
 	{
@@ -64,7 +64,6 @@ std::vector<std::pair<int, std::vector<int>>> Computer::orderMoves(std::vector<s
 	std::sort(moves.begin(), moves.end(), [&](const std::pair<int, std::vector<int>> &a, const std::pair<int, std::vector<int>> &b) {
 		return (m_weight_map[a.first] + 3 * a.second.size()) > (m_weight_map[b.first] + 3 * b.second.size());
 	});
-
 	return moves;
 }
 
@@ -75,13 +74,9 @@ int Computer::evaluateBoard(const Board *board)
 	{
 		std::pair<int, int> points = board->countPoints();
 		if (points.first == points.second)
-		{
 			return 0;
-		}
 		else
-		{
 			return 1000 * (points.second - points.first);
-		}
 	}
 	
 	const int *cur_board = board->getBoard();

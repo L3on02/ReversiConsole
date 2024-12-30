@@ -2,7 +2,6 @@
 #include "Computer.h"
 #include "Board.h"
 #include "Interface.h"
-#include <unistd.h>
 
 Controller::Controller()
 {
@@ -75,10 +74,6 @@ void Controller::runGame()
 			if (m_is_vs_computer && player == 2)
 			{
 				move = m_computer->computerSelectMove();
-				std::string move_str = char(move % 10 + 'A' - 1) + std::to_string(move / 10);
-				std::cerr << "Computer selected move: " << move_str << std::endl;
-				
-				sleep(1);
 			}
 			else
 			{
