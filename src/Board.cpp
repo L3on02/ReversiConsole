@@ -121,6 +121,11 @@ std::pair<int, int> Board::countPoints() const
 	return std::make_pair(m_stone_counts[1], m_stone_counts[2]);
 }
 
+int Board::totalStones() const
+{
+    return m_stone_counts[0];
+}
+
 int Board::getCurrentPlayer() const
 {
 	return m_current_player;

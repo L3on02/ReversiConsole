@@ -1,13 +1,37 @@
 #include "Computer.h"
 #include "Board.h"
 #include <algorithm>
+#include <cmath>
 
 Computer::Computer(Board *board) : m_board(board) {};
 
 int Computer::computerSelectMove()
 {
-	m_total_moves++;
-	return determineBestMove();
+	std::vector<std::pair<int, std::vector<int>>> moves = m_board->getMoves();
+
+	if (moves.size() == 1)
+	{
+		return moves[0].first;
+	}
+
+	int best_move = moves[0].first;
+	int best_value = -1000;
+
+	int search_depth = 4 + (16 / (1 + exp(-0.1 * ( m_board->totalStones() - 50)))); // sigmoid function to determine search depth -> 
+
+	for (auto &mv : moves)
+	{
+		Board *board_copy = new Board(*m_board);
+		board_copy->makeMove(mv.first);
+		int value = negamax(search_depth, -1000, 1000, 1, board_copy);
+		if (value > best_value)
+		{
+			best_value = value;
+			best_move = mv.first;
+		}
+		delete board_copy;
+	}
+	return best_move;
 }
 
 // negamax is a variation of minmax that uses the property that the value of a node is the negative of the value of its children
@@ -42,32 +66,6 @@ std::vector<std::pair<int, std::vector<int>>> Computer::orderMoves(std::vector<s
 	});
 
 	return moves;
-}
-
-int Computer::determineBestMove()
-{
-	std::vector<std::pair<int, std::vector<int>>> moves = m_board->getMoves();
-
-	if (moves.size() == 1)
-	{
-		return moves[0].first;
-	}
-
-	int best_move = moves[0].first;
-	int best_value = -1000;
-	for (auto &mv : moves)
-	{
-		Board *board_copy = new Board(*m_board);
-		board_copy->makeMove(mv.first);
-		int value = negamax(6, -1000, 1000, 1, board_copy);
-		if (value > best_value)
-		{
-			best_value = value;
-			best_move = mv.first;
-		}
-		delete board_copy;
-	}
-	return best_move;
 }
 
 // score is positive if the board is in favor of player 2

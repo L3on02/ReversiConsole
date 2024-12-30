@@ -70,6 +70,13 @@ public:
 	std::pair<int, int> countPoints() const;
 
 	/**
+	 * @brief Gets the total amount of stones on the board
+	 * 
+	 * @return An integer representing the total amount of stones on the board
+	 */
+	int totalStones() const;
+
+	/**
 	 * @brief Gets the next player
 	 * 
 	 * @return An integer representing the next player (1 or 2)

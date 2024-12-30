@@ -14,14 +14,10 @@ public:
 	int computerSelectMove();
 
 private:
-	int determineBestMove();
     int negamax(int depth, int alpha, int beta, int perspective, Board *board);
-
     std::vector<std::pair<int, std::vector<int>>> orderMoves(std::vector<std::pair<int, std::vector<int>>> moves);
 
     int evaluateBoard(const Board* board);
-
-	int m_total_moves = 0;
 
     Board *m_board;
 
