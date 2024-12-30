@@ -78,9 +78,7 @@ void Controller::runGame()
 				std::string move_str = char(move % 10 + 'A' - 1) + std::to_string(move / 10);
 				std::cerr << "Computer selected move: " << move_str << std::endl;
 				
-				std::cout << "Continue..." << std::endl;
-				std::cin.get();
-				std::cin.ignore();
+				sleep(1);
 			}
 			else
 			{

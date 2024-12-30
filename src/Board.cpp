@@ -14,7 +14,6 @@ Board::Board(const Board &other)
 	  m_index_last_move(other.m_index_last_move),
 	  m_possible_moves(other.m_possible_moves)
 {
-	// Copy the board array using getter methods or directly if allowed
 	for (int i = 0; i < 100; ++i)
 	{
 		m_board[i] = other.m_board[i];
@@ -67,7 +66,6 @@ void Board::loadBoard(int board[])
 std::vector<std::pair<int, std::vector<int>>> Board::getMoves(bool get_estimations) const
 {
 	std::vector<std::pair<int, std::vector<int>>> moves;
-
 	if (get_estimations)
 	{
 		for (auto &mv : m_estimated_moves)
@@ -157,7 +155,7 @@ const int *Board::getBoard() const
 void Board::checkForMoves()
 {
 	m_possible_moves.clear();
-	m_estimated_moves.clear(); // Clear the estimated moves for the other player
+	m_estimated_moves.clear();
 
 	for (int i = 1; i < 10 - 1; i++) // Exclude borders of the board
 	{
@@ -199,8 +197,8 @@ void Board::checkForMoves()
 
 				for (int direction : {-11, -10, -9, -1, 1, 9, 10, 11}) // Check all 8 directions
 				{
-					if (!checkDirection(direction, m_current_player, move_flips_current))
-						checkDirection(direction, m_other_player , move_flips_other);
+					if (!checkDirection(direction, m_current_player, move_flips_current)) // If there is no move for the first player, try the second
+						checkDirection(direction, m_other_player, move_flips_other);
 				}
 
 				if (!move_flips_current.empty()) // If any valid flips were found, this is a valid move
@@ -216,9 +214,7 @@ void Board::checkForMoves()
 bool Board::makeMove(int index)
 {
 	if (m_game_end || m_possible_moves.find(index) == m_possible_moves.end())
-	{
 		return false;
-	}
 
 	m_board[index] = m_current_player;
 

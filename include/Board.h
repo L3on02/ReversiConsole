@@ -91,7 +91,7 @@ private:
 	int m_move_not_possible = 0; // Stores how many times in a row any player could not move
 	int m_index_last_move = -1; // Stores the index of the last move
 
-	int m_stone_counts[3]; // Stores the total amount of stones and stones for each player (0 = total, 1 = player 1, 2 = player 2)
+	int m_stone_counts[3]; // Stores the total amount of stones and the stones for each player (0 = total, 1 = player 1, 2 = player 2)
 
 	std::unordered_map<int, std::vector<int>> m_possible_moves;
 	std::unordered_map<int, std::vector<int>> m_estimated_moves; // Stores the possible moves that the other player could make, would it be their turn (used for board evaluation)	
