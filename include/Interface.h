@@ -26,10 +26,10 @@ public:
 
 private:
     void printError(int id);
-	std::string getColorCode(int id);
+    std::string getColorCode(int id);
 
     const int m_rows = 10;
-	const int m_cols = 10;
+    const int m_cols = 10;
 
     bool m_first_load = true;
 

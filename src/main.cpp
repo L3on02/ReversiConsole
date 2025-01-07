@@ -9,10 +9,10 @@
 
 int main()
 {
-	srand(time(0)); // since we will need a random generator later
-	
-	Controller controller;
-	controller.start();
+    srand(time(0)); // since we will need a random generator later
+    
+    Controller controller;
+    controller.start();
 
-	return 0;
+    return 0;
 }
