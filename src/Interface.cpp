@@ -30,21 +30,15 @@ Interface::Interface(Controller *controller) : m_controller(controller) {}
 void Interface::showRules()
 {
     system("clear");
-    std::cout << std::endl;
-    std::cout << "------------------------ Rules ------------------------" << std::endl;
+    std::cout << "\n------------------------ Rules ------------------------" << std::endl;
     std::cout << " - Players take turns; the start is determined randomly." << std::endl;
     std::cout << " - Each player has pieces in their assigned color." << std::endl;
-    std::cout << " - A piece must be placed on an empty field adjacent to a field occupied" << std::endl;
-    std::cout << "   by a piece of the other color (horizontally, vertically, or diagonally)." << std::endl;
+    std::cout << " - A piece must be placed on an empty field adjacent to a field occupied\nby a piece of the other color (horizontally, vertically, or diagonally)." << std::endl;
     std::cout << " - If a player cannot place a piece, the other player takes the turn." << std::endl;
-    std::cout << " - Plastd::cing a piece that encloses one or more rows at both ends" << std::endl;
-    std::cout << "   with pieces of your own color allows you to flip all pieces" << std::endl;
-    std::cout << "   of the opponent's color in between to your own color." << std::endl;
-    std::cout << " - The game ends when all fields are occupied or" << std::endl;
-    std::cout << "   neither player can make a move." << std::endl;
+    std::cout << " - Placing a piece that encloses one or more rows at both ends\nwith pieces of your own color allows you to flip all pieces\nof the opponent's color in between." << std::endl;
+    std::cout << " - The game ends when all fields are occupied or\nneither player can make a move." << std::endl;
     std::cout << " - The winner is the player with the most pieces in their color." << std::endl;
-    std::cout << "-------------------------------------------------------" << std::endl;
-    std::cout << std::endl;
+    std::cout << "-------------------------------------------------------\n" << std::endl;
 }
 
 // The menu allows the selection of the desired game mode and then calls the "Controller," which controls the actual game

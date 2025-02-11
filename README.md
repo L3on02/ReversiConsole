@@ -2,7 +2,7 @@
 Implementation of the strategy game [Reversi](https://en.wikipedia.org/wiki/Reversi) as a console application with 
 move validation a simple TUI and a computer opponent. The game is implemented in C++ in a modular way, with the game 
 logic separated from the user interface. The game can be played by two human players or by a human player against a
-computer opponent. The computer opponent uses a simple heuristic to determine the best move to make.
+computer opponent. The computer opponent uses a minmax variant with alpha-beta pruning to determine its moves.
 
 ## How to play
 1. Clone the repository

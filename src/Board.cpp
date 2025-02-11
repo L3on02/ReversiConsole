@@ -66,19 +66,9 @@ void Board::loadBoard(int board[])
 std::vector<std::pair<int, std::vector<int>>> Board::getMoves(bool get_estimations) const
 {
     std::vector<std::pair<int, std::vector<int>>> moves;
-    if (get_estimations)
+    for (auto &mv : (get_estimations ? m_estimated_moves : m_possible_moves))
     {
-        for (auto &mv : m_estimated_moves)
-        {
-            moves.push_back(mv);
-        }
-    }
-    else
-    {
-        for (auto &mv : m_possible_moves)
-        {
-            moves.push_back(mv);
-        }
+        moves.push_back(mv);
     }
     return moves;
 }
