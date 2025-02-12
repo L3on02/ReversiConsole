@@ -3,28 +3,22 @@
 #include "Board.h"
 #include "Interface.h"
 
-Controller::Controller()
-{
-    m_interface = new Interface(this);
-}
-
-Controller::~Controller()
-{
-    delete m_interface;
-}
-
 void Controller::start()
 {
+    m_interface = new Interface(this);
     do
     {
         // Shows the menu and returns the number of players
-        if (m_player_count = m_interface->showMenu(); m_player_count == 0)
-            break;
+        /* if (m_player_count = m_interface->showMenu(); m_player_count == 0)
+            break; remove*/
+        m_player_count = 1; //remove
         initializeGame();
         runGame();
         evaluateGame();
+    }
+    while (m_interface->queryPlayAgain());
 
-    } while (m_interface->queryPlayAgain());
+    delete m_interface;
 }
 
 std::string Controller::returnName(bool is_player_1)
@@ -34,7 +28,7 @@ std::string Controller::returnName(bool is_player_1)
 
 void Controller::initializeGame() // Initializes all important values and lets the player set the parameters for the game.
 {
-    m_player1_name = m_interface->nameInput(1); // reads the name of player 1
+    m_player1_name = "Leon";//remove m_interface->nameInput(1); // reads the name of player 1
 
     if (m_player_count == 2)
     {
@@ -47,7 +41,7 @@ void Controller::initializeGame() // Initializes all important values and lets t
         m_is_vs_computer = true;
     }
     
-    int board_id = m_interface->showSelectBoard();
+    int board_id = 0; // remove m_interface->showSelectBoard();
     m_board = new Board(board_id);
 
     if (m_is_vs_computer)

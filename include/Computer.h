@@ -3,21 +3,20 @@
 
 #include <vector>
 
-// forward declaration
-class Board;
+#include "Board.h"
 
 class Computer
 {
 public:
-    Computer(Board *board);
+    Computer(Board *board) : m_board(board) {};
 
     int computerSelectMove();
 
 private:
-    int negamax(int depth, int alpha, int beta, int perspective, Board *board);
+    int negamax(int depth, int alpha, int beta, int perspective, Board &board);
     std::vector<std::pair<int, std::vector<int>>> orderMoves(std::vector<std::pair<int, std::vector<int>>> moves);
 
-    int evaluateBoard(const Board* board);
+    int evaluateBoard(const Board &board);
 
     Board *m_board;
 

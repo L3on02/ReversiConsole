@@ -2,18 +2,15 @@
 #define GAMEMASTER_H
 
 #include <string>
+#include <optional>
 
-// forward declarations
-class Board;
-class Computer;
-class Interface;
+#include "Board.h"
+#include "Computer.h"
+#include "Interface.h"
 
 class Controller
 {
 public:
-    Controller();
-    ~Controller();
-    
     void start();
     std::string returnName(bool is_player_1);
 
@@ -32,7 +29,7 @@ private:
 
     Board *m_board = nullptr;
     Computer *m_computer = nullptr;
-    Interface *m_interface;
+    Interface *m_interface = nullptr;
 };
 
 #endif

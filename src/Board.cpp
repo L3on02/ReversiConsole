@@ -206,6 +206,33 @@ void Board::checkForMoves()
     }
 }
 
+void Board::undoMove()
+{
+    if (m_move_history.empty())
+        return;
+
+    MoveRecord last_move = m_move_history.back();
+    m_move_history.pop_back();
+
+    m_board[last_move.pos] = 0;
+    m_stone_counts[m_current_player]--;
+    m_stone_counts[0]--;
+
+    for (int flip_index : last_move.flips)
+    {
+        m_board[flip_index] = m_other_player;
+        m_stone_counts[m_current_player]--;
+        m_stone_counts[m_other_player]++;
+    }
+
+    m_index_last_move = last_move.last_move;
+    m_move_not_possible = last_move.move_not_possible;
+    m_possible_moves = last_move.possible_moves;
+    m_estimated_moves = last_move.estimated_moves;
+    m_game_end = false;
+    togglePlayer();
+}
+
 bool Board::makeMove(int index)
 {
     if (m_game_end || m_possible_moves.find(index) == m_possible_moves.end())
@@ -225,8 +252,9 @@ bool Board::makeMove(int index)
         m_stone_counts[m_current_player]++;
         m_stone_counts[m_other_player]--;
     }
-
+    m_move_history.push_back(MoveRecord(index, m_possible_moves[index], m_possible_moves, m_estimated_moves, m_move_not_possible, m_index_last_move)); // Store the move in the history
     m_index_last_move = index;
+
     nextPlayer();
     return true;
 }

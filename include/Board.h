@@ -5,6 +5,20 @@
 #include <vector>
 #include <unordered_map>
 
+struct MoveRecord {
+    int pos;                 // Position of the new piece
+    std::vector<int> flips;  // List of flipped pieces
+
+    // previous values to restore the board state
+    std::unordered_map<int, std::vector<int>> possible_moves;
+    std::unordered_map<int, std::vector<int>> estimated_moves;
+    int move_not_possible;
+    int last_move;
+
+    MoveRecord(int pos, std::vector<int> flips, std::unordered_map<int, std::vector<int>> possible_moves, std::unordered_map<int, std::vector<int>> estimated_moves, int move_not_possible, int last_move)
+        : pos(pos), flips(flips), possible_moves(possible_moves), estimated_moves(estimated_moves), move_not_possible(move_not_possible), last_move(last_move) {}
+};
+
 class Board
 {
 public:
@@ -38,6 +52,11 @@ public:
      * @return returns `true` if the move was successful and `false` if it the move was not allowed
      */
     bool makeMove(int index);
+
+    /**
+     * @brief Undoes the last move
+     */
+    void undoMove();
 
     /**
      * @brief Checks if the game has ended
@@ -99,6 +118,8 @@ private:
     int m_index_last_move = -1; // Stores the index of the last move
 
     int m_stone_counts[3]; // Stores the total amount of stones and the stones for each player (0 = total, 1 = player 1, 2 = player 2)
+
+    std::vector<MoveRecord> m_move_history; // Stores the history of moves
 
     std::unordered_map<int, std::vector<int>> m_possible_moves;
     std::unordered_map<int, std::vector<int>> m_estimated_moves; // Stores the possible moves that the other player could make, would it be their turn (used for board evaluation)    
